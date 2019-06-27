@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net/http"
+	"os"
 	"regexp"
 
 	"github.com/chzyer/readline"
@@ -18,13 +19,13 @@ type session struct {
 	errChan chan error
 }
 
-func connect(url, origin string, rlConf *readline.Config, allowInsecure bool) error {
+func connect(url, origin string, rlConf *readline.Config, allowInsecure bool, readOnly bool) error {
 	headers := make(http.Header)
 	headers.Add("Origin", origin)
 
 	dialer := websocket.Dialer{
 		Proxy: http.ProxyFromEnvironment,
-		TLSClientConfig:&tls.Config{
+		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: allowInsecure,
 		},
 	}
@@ -45,7 +46,9 @@ func connect(url, origin string, rlConf *readline.Config, allowInsecure bool) er
 		errChan: make(chan error),
 	}
 
-	go sess.readConsole()
+	if !readOnly {
+		go sess.readConsole()
+	}
 	go sess.readWebsocket()
 
 	return <-sess.errChan
@@ -55,12 +58,14 @@ func (s *session) readConsole() {
 	for {
 		line, err := s.rl.Readline()
 		if err != nil {
+			fmt.Fprintln(os.Stderr, "s.rl.Readline failed")
 			s.errChan <- err
 			return
 		}
 
 		err = s.ws.WriteMessage(websocket.TextMessage, []byte(line))
 		if err != nil {
+			fmt.Fprintln(os.Stderr, "s.ws.WriteMessge failed")
 			s.errChan <- err
 			return
 		}
@@ -78,6 +83,7 @@ func (s *session) readWebsocket() {
 	for {
 		msgType, buf, err := s.ws.ReadMessage()
 		if err != nil {
+			fmt.Fprintln(os.Stderr, "s.ws.ReadMessage failed")
 			s.errChan <- err
 			return
 		}
@@ -89,8 +95,8 @@ func (s *session) readWebsocket() {
 		case websocket.BinaryMessage:
 			text = bytesToFormattedHex(buf)
 		default:
-			s.errChan <- fmt.Errorf("unknown websocket frame type: %d", msgType)
-			return
+			fmt.Fprintf(os.Stderr, "unknown websocket frame type: %d\n", msgType)
+			continue
 		}
 
 		fmt.Fprint(s.rl.Stdout(), rxSprintf("< %s\n", text))
