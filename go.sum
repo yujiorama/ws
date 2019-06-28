@@ -1,5 +1,9 @@
+github.com/chzyer/logex v1.1.10 h1:Swpa1K6QvQznwJRcfTfQJmTE72DqScAa40E+fbHEXEE=
+github.com/chzyer/logex v1.1.10/go.mod h1:+Ywpsq7O8HXn0nuIou7OrIPyXbp3wmkHB+jjWRnGsAI=
 github.com/chzyer/readline v0.0.0-20160901120112-4ffff9f41c77 h1:ZuxeAxzrJWSFnIpTzVaVxzB0ESSGZwFsLLNTSXpU43A=
 github.com/chzyer/readline v0.0.0-20160901120112-4ffff9f41c77/go.mod h1:nSuG5e5PlCu98SY8svDHJxuZscDgtXS6KTTbou5AhLI=
+github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1 h1:q763qf9huN11kDQavWsoZXJNW3xEE4JJyHa5Q25/sd8=
+github.com/chzyer/test v0.0.0-20180213035817-a1ea475d72b1/go.mod h1:Q3SI9o4m/ZMnBNeIyt5eFwwo7qiLfzFZmjNmxjkiQlU=
 github.com/fatih/color v1.0.0 h1:4zdNjpoprR9fed2QRCPb2VTPU4UFXEtJc9Vc+sgXkaQ=
 github.com/fatih/color v1.0.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/gorilla/websocket v0.0.0-20160802133203-a69d25be2fe2 h1:XnvBrDUVjkFNo9Jph5a2xxPt0Naf2H3qoOOHNva3/SU=
@@ -14,4 +18,5 @@ github.com/spf13/cobra v0.0.0-20160830174925-9c28e4bbd74e h1:YdP6GKJS0Ls++kXc85W
 github.com/spf13/cobra v0.0.0-20160830174925-9c28e4bbd74e/go.mod h1:1l0Ry5zgKvJasoi3XT1TypsSe7PqH0Sj9dhYf7v3XqQ=
 github.com/spf13/pflag v0.0.0-20160820154156-103ce5cd2042 h1:VWlVV19lRdqmaPmY4E9ZPm1jN+7q6AUdRaKZG5HO5zw=
 github.com/spf13/pflag v0.0.0-20160820154156-103ce5cd2042/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnInEg4=
+golang.org/x/sys v0.0.0-20160717071931-a646d33e2ee3 h1:ZLExsLvnoqWSw6JB6k6RjWobIHGR3NG9dzVANJ7SVKc=
 golang.org/x/sys v0.0.0-20160717071931-a646d33e2ee3/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=

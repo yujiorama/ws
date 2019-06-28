@@ -18,6 +18,7 @@ var options struct {
 	insecure            bool
 	readOnly            bool
 	numberOfConcurrency int
+	queryParams         []string
 }
 
 func main() {
@@ -31,6 +32,7 @@ func main() {
 	rootCmd.Flags().BoolVarP(&options.insecure, "insecure", "k", false, "skip ssl certificate check")
 	rootCmd.Flags().BoolVarP(&options.readOnly, "readonly", "r", false, "read only")
 	rootCmd.Flags().IntVarP(&options.numberOfConcurrency, "number", "n", 1, "number of concurrency")
+	rootCmd.Flags().StringSliceVarP(&options.queryParams, "params", "p", []string{"genba00"}, "query parameter args")
 
 	rootCmd.Execute()
 }
@@ -51,6 +53,7 @@ func root(cmd *cobra.Command, args []string) {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+	destURLString := dest.String()
 
 	var origin string
 	if options.origin != "" {
@@ -67,14 +70,17 @@ func root(cmd *cobra.Command, args []string) {
 
 	var wg sync.WaitGroup
 	for n := 0; n < options.numberOfConcurrency; n++ {
-		wg.Add(1)
-		go func(wg *sync.WaitGroup) {
-			defer wg.Done()
-			err = connect(dest.String(), origin, &readline.Config{}, options.insecure, options.readOnly)
-			if err != nil {
-				fmt.Fprintln(os.Stderr, err)
-			}
-		}(&wg)
+		for _, param := range options.queryParams {
+			wg.Add(1)
+			destURL := fmt.Sprintf(destURLString, param)
+			go func(wg *sync.WaitGroup, destURL string) {
+				defer wg.Done()
+				err = connect(destURL, origin, &readline.Config{}, options.insecure, options.readOnly)
+				if err != nil {
+					fmt.Fprintln(os.Stderr, err)
+				}
+			}(&wg, destURL)
+		}
 	}
 	wg.Wait()
 }
