@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"time"
 
 	"github.com/chzyer/readline"
 	"github.com/fatih/color"
@@ -99,6 +100,6 @@ func (s *session) readWebsocket() {
 			continue
 		}
 
-		fmt.Fprint(s.rl.Stdout(), rxSprintf("< %s\n", text))
+		fmt.Fprint(s.rl.Stdout(), rxSprintf("%s [%s] %s\n", time.Now().UTC(), s.ws.LocalAddr(), text))
 	}
 }

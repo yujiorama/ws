@@ -2,11 +2,9 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net/url"
 	"os"
-	"os/user"
-	"path/filepath"
+	"sync"
 
 	"github.com/chzyer/readline"
 	"github.com/spf13/cobra"
@@ -15,10 +13,11 @@ import (
 const Version = "0.2.1"
 
 var options struct {
-	origin       string
-	printVersion bool
-	insecure     bool
-	readOnly     bool
+	origin              string
+	printVersion        bool
+	insecure            bool
+	readOnly            bool
+	numberOfConcurrency int
 }
 
 func main() {
@@ -31,6 +30,7 @@ func main() {
 	rootCmd.Flags().BoolVarP(&options.printVersion, "version", "v", false, "print version")
 	rootCmd.Flags().BoolVarP(&options.insecure, "insecure", "k", false, "skip ssl certificate check")
 	rootCmd.Flags().BoolVarP(&options.readOnly, "readonly", "r", false, "read only")
+	rootCmd.Flags().IntVarP(&options.numberOfConcurrency, "number", "n", 1, "number of concurrency")
 
 	rootCmd.Execute()
 }
@@ -65,20 +65,16 @@ func root(cmd *cobra.Command, args []string) {
 		origin = originURL.String()
 	}
 
-	var historyFile string
-	user, err := user.Current()
-	if err == nil {
-		historyFile = filepath.Join(user.HomeDir, ".ws_history")
+	var wg sync.WaitGroup
+	for n := 0; n < options.numberOfConcurrency; n++ {
+		wg.Add(1)
+		go func(wg *sync.WaitGroup) {
+			defer wg.Done()
+			err = connect(dest.String(), origin, &readline.Config{}, options.insecure, options.readOnly)
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+			}
+		}(&wg)
 	}
-
-	err = connect(dest.String(), origin, &readline.Config{
-		Prompt:      "> ",
-		HistoryFile: historyFile,
-	}, options.insecure, options.readOnly)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		if err != io.EOF && err != readline.ErrInterrupt {
-			os.Exit(1)
-		}
-	}
+	wg.Wait()
 }
